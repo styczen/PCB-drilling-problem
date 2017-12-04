@@ -8,9 +8,10 @@ class Pcb():
 
     def __init__(self,file_name):
         self.D = np.zeros((2,2))
+        self.T = np.zeros((2,2))
         self.file_name = file_name
-        self.x = []  # wsp x pkt
-        self.y = []  # wsp y pkt
+        self.x = []
+        self.y = []
         self.tools_number = []
 
     def read_data(self):
@@ -34,11 +35,33 @@ class Pcb():
         self.D = D
         return D
 
+    def times_matrix(self):
+        t=np.array([[4,9,4,5,4,5,5],[6,5,2,4,1,5,9],[2,5,5,1,6,7,3],[9,2,9,5,4,1,7],[1,9,7,7,2,2,3],[6,4,9,6,3,6,3],[8,2,9,9,3,7,2]])
+        #t = np.random.randint(low=1, high=10, size=(self.tools_number[-1], self.tools_number[-1]))
+        T = np.zeros((len(self.D),len(self.D)))
+        for i in range(len(T)):
+            for j in range(len(T)):
+                if i != j:
+                    if self.tools_number[i] != self.tools_number[j]:
+                        T[i][j] = t[self.tools_number[i]-1][self.tools_number[j]-1]
+        self.T = T
+        return T
+
     def show(self):
         plt.plot(self.x, self.y, '.')
         plt.xlabel(u'Współrzedne X')
         plt.ylabel(u'Współrzedne Y')
-        plt.title('Przykładowa płytka PCB')
+        plt.title('Widok PCB')
         plt.show()
 
 
+""" Testowanie
+pkta=1
+pktb=150
+dd=Pcb("pcb.txt")
+dd.distance_matrix()
+dd.times_matrix()
+print("odległość: {}".format(dd.D[pkta][pktb]))
+print("Czas przezbrojenia: {}".format(dd.T[pkta][pktb]))
+print("PKT A to narzędzie {} a pkt B to {}".format(dd.tools_number[pkta],dd.tools_number[pktb]))
+"""
