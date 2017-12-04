@@ -8,19 +8,22 @@ class Pcb():
 
     def __init__(self,file_name):
         self.D = np.zeros((2,2))
-        self.file = open(file_name,"a+")
+        self.file_name = file_name
         self.x = []  # wsp x pkt
         self.y = []  # wsp y pkt
-
-    def __del__(self):
-        self.file.close()
+        self.tools_number = []
 
     def read_data(self):
-        with open('pcb.txt','r') as csvfile:  # pcb.txt to plik ze wspolrzednymi
+        number_of_tools = 1
+        with open(self.file_name,'r') as csvfile:  # pcb.txt to plik ze wspolrzednymi
             points = csv.reader(csvfile, delimiter=' ')
-            for point in points:
-                self.x.append(int(point[0]) / 100)  # dodajemy do listy wczytywane współrzędne
-                self.y.append(int(point[1]) / 100)  # dzielimy przez 100 aby wspolrzzedne byly w mm
+            for i, point in enumerate(points):
+                if point != []:
+                    self.x.append(int(point[0]) / 100)  # dodajemy do listy wczytywane współrzędne
+                    self.y.append(int(point[1]) / 100)  # dzielimy przez 100 aby wspolrzzedne byly w mm
+                    self.tools_number.append(number_of_tools)
+                else:
+                    number_of_tools += 1
 
     def distance_matrix(self):
         self.read_data()
@@ -39,6 +42,3 @@ class Pcb():
         plt.show()
 
 
-dd=Pcb("pcb.txt")
-matrix = dd.distance_matrix()
-print(matrix[0][2])
