@@ -13,6 +13,7 @@ class Pcb():
         self.x = []
         self.y = []
         self.tools_number = []
+        self.read_data()
 
     def read_data(self):
         number_of_tools = 1
@@ -27,7 +28,6 @@ class Pcb():
                     number_of_tools += 1
 
     def distance_matrix(self):
-        self.read_data()
         D = np.zeros((len(self.x),len(self.x)))
         for i in range(len(self.x)):
             for j in range(len(self.x)):
@@ -55,13 +55,13 @@ class Pcb():
         plt.show()
 
 
-""" Testowanie
-pkta=1
-pktb=150
-dd=Pcb("pcb.txt")
-dd.distance_matrix()
-dd.times_matrix()
-print("odległość: {}".format(dd.D[pkta][pktb]))
-print("Czas przezbrojenia: {}".format(dd.T[pkta][pktb]))
-print("PKT A to narzędzie {} a pkt B to {}".format(dd.tools_number[pkta],dd.tools_number[pktb]))
-"""
+if __name__ == "__main__":
+    pkta=1
+    pktb=150
+    dd=Pcb("pcb.txt")
+    dd.distance_matrix()
+    dd.times_matrix()
+    print("Wielkość tablicy: {}".format(dd.distance_matrix().shape))
+    print("odległość: {}".format(dd.D[pkta][pktb]))
+    print("Czas przezbrojenia: {}".format(dd.T[pkta][pktb]))
+    print("PKT A to narzędzie {} a pkt B to {}".format(dd.tools_number[pkta],dd.tools_number[pktb]))
