@@ -43,7 +43,6 @@ class ObjectiveFun():
     """
     def __init__(self, file_name, t_min):
         self.data = load_data.Pcb(file_name)
-        self.data.read_data()
         self.data.distance_matrix()
         self.data.times_matrix()
         self.data.show()
