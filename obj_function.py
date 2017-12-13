@@ -53,6 +53,8 @@ class ObjectiveFun():
         wg danego wektora rozwiązania, w tym czas potzrzebny na przezbrojenie
         oraz czas oczekiwania na ostygnięcie płytki
         """
+        permutation = np.insert(permutation, 0, [0])
+        permutation = np.insert(permutation, permutation.shape[0], [0])
         return distance_function(permutation, self.data.D, self.data.T) + loss_function(permutation, self.data.D, self.data.T, self.tmin)
 
     def real_permutation(self, permutation):
@@ -60,6 +62,8 @@ class ObjectiveFun():
         uwzględnia ewentualny powrót do punktu bazowego w celu przezbrojenia
         """
         real_permutation = permutation
+        real_permutation = np.insert(real_permutation, 0, [0])
+        real_permutation = np.insert(real_permutation, real_permutation.shape[0], [0])
         i = 0
         while True:
             if i == real_permutation.shape[0] - 1:
@@ -69,3 +73,4 @@ class ObjectiveFun():
                     real_permutation = np.insert(real_permutation, i + 1, [0])
             i += 1
         return real_permutation
+
