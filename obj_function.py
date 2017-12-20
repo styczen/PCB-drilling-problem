@@ -1,4 +1,4 @@
-# import math                         # pozwala na operacje matematyczne typu sqrt
+﻿# import math                         # pozwala na operacje matematyczne typu sqrt
 # import matplotlib.pyplot as plt     # do wykresów(składnia jak plot w matlabie)
 # import csv                          # do wczytywania lini z pliku jako rekordy
 import numpy as np
@@ -41,8 +41,8 @@ class ObjectiveFun():
     u"""Udostępnia metody obliczania wartości funkcji celu oraz generowania
     rzeczywistego wektora rozwiązania z uwzględnieniem powrotów do punktu bazowego
     """
-    def __init__(self, file_name, t_min):
-        self.data = load_data.Pcb(file_name)
+    def __init__(self, file_name, t_min, point_number, number_of_tools):
+        self.data = load_data.Pcb(file_name, point_number, number_of_tools)
         self.data.distance_matrix()
         self.data.times_matrix()
         self.data.show()
