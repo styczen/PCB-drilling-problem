@@ -45,7 +45,6 @@ class ObjectiveFun():
         self.data = load_data.Pcb(file_name, point_number, number_of_tools)
         self.data.distance_matrix()
         self.data.times_matrix()
-        self.data.show()
         self.tmin = t_min
 
     def obj_function(self, permutation):

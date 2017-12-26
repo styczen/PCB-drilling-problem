@@ -1,23 +1,24 @@
 #!/usr/bin/env python
-from obj_function import ObjectiveFun
+import obj_function
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 class TabuSearch():
     """Class implements tabu search algorithm having cost funtion value"""
-    def __init__(self, file_name, initial_solution, initial_fitness,
-                 number_of_iterations=100, tabu_list_length=10, 
-                 expiration_time=10, type_of_neighborhood=2):
-        self.OF = ObjectiveFun(file_name, 3)
+    def __init__(self, file_name, init_solution, init_objective_fun_value, stats_every_iteration=False,
+                 number_of_iterations=100, tabu_list_length=10, type_of_neighborhood=2,
+                 t_min=3, point_number=20, number_of_tools=2):
+        self.OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
         self.number_of_iterations = number_of_iterations
-        self.tabu_list = np.zeros(shape=(tabu_list_length, len(initial_solution)), dtype=int)
-        self.tabu_list_indicator = 0
-        self.tabu_list_time = np.zeros(shape=tabu_list_length, dtype=int)
-        self.tabu_list_time_indicator = 0
-        self.fitness = initial_fitness
-        self.solution = initial_solution
-        self.expiration_time = expiration_time
+        self.tabu_list = np.array([], dtype=int)
+        self.tabu_list_length = tabu_list_length
+        self.objective_fun_value = init_objective_fun_value
+        self.solution = init_solution
+        self.solution_length = len(self.solution)
         self.type_of_neighborhood = int(type_of_neighborhood / 2)
+        self.all_objective_fun_value = np.array([])
+        self.stats_every_iteration = stats_every_iteration
         # self.aspiration_criteria = False
 
     def get_tabu_candidate(self):
@@ -26,8 +27,8 @@ class TabuSearch():
         index_b_array = np.array([])
         permutation = self.solution
         for iteration in range(self.type_of_neighborhood):
-            index_a = random.randint(0, len(self.solution))
-            index_b = random.randint(0, len(self.solution))
+            index_a = random.randint(0, len(self.solution) - 1)
+            index_b = random.randint(0, len(self.solution) - 1)
             if index_a in index_a_array or index_b in index_b_array:
                 iteration = iteration - 1
                 continue
@@ -39,6 +40,7 @@ class TabuSearch():
     def get_neighbor(self):
         """Permutes new neighborhood excluding ones from tabu list"""
         permutation_find_indicator = False
+        self.tabu_list = self.tabu_list.reshape(len(self.tabu_list) // self.solution_length, self.solution_length)
         while not permutation_find_indicator:
             permutation = self.get_tabu_candidate()
             for i in range(self.tabu_list.shape[0]):
@@ -48,30 +50,37 @@ class TabuSearch():
         return permutation
 
     def update_memory(self, candidate):
-        """Add new elements to the list and removes those which are too long"""
-        self.tabu_list_time = self.tabu_list_time + 1
-        self.tabu_list_time = np.append(self.tabu_list_time, 1)
-        # if len(self.tabu_list) == 
+        """Add new elements to the tabu list and removes those which are too long"""
         self.tabu_list = np.append(self.tabu_list, candidate)
-        for index in range(len(self.tabu_list_time)):
-            if self.tabu_list_time[index] >= self.expiration_time:
-                self.tabu_list = np.delete(self.tabu_list, index, axis=0)
-                self.tabu_list_time = np.delete(self.tabu_list_time, index)
+        if self.tabu_list.reshape(len(self.tabu_list) // self.solution_length, self.solution_length).shape[0] >= self.tabu_list_length:
+            delete_vector = [i for i in range(self.solution_length)]
+            self.tabu_list = np.delete(self.tabu_list, delete_vector)
 
     def run(self):
         """Main method which searches for optimal solution"""
         for i in range(self.number_of_iterations):
-            print(i)
+            self.all_objective_fun_value = np.append(self.all_objective_fun_value, self.objective_fun_value)
             best_candidate = self.get_neighbor()
-            # print(best_candidate)
             tabu_candidate = self.get_tabu_candidate()
+            # print(best_candidate)
             # print(tabu_candidate)
-            if self.OF.obj_function(best_candidate) < self.fitness:
+            if self.OF.obj_function(best_candidate) < self.objective_fun_value:
                 self.solution = best_candidate
-                self.fitness = self.OF.obj_function(best_candidate)
-            if self.OF.obj_function(tabu_candidate) < self.fitness:
+                self.objective_fun_value = self.OF.obj_function(best_candidate)
+            if self.OF.obj_function(tabu_candidate) < self.objective_fun_value:
                 best_candidate = tabu_candidate
                 self.solution = tabu_candidate
-                self.fitness = self.OF.obj_function(tabu_candidate)
-            print(best_candidate)
+                self.objective_fun_value = self.OF.obj_function(tabu_candidate)
             self.update_memory(best_candidate)
+            if self.stats_every_iteration == True:
+                print("Iteration number: " + str(i))
+                print("Solution: " + str(self.solution))
+                print("objective_fun_value: " + str(self.objective_fun_value), end="\n\n")
+
+    def show_objective_fun_value_plot(self):
+        """Display plot of all objective_fun_valuees"""
+        plt.plot(self.all_objective_fun_value)
+        plt.xlabel('Number of iteration')
+        plt.ylabel('Value')
+        plt.title('Objective function value')
+        plt.show()
