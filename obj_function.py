@@ -43,8 +43,8 @@ class ObjectiveFun():
     """
     def __init__(self, file_name, t_min, point_number, number_of_tools):
         self.data = load_data.Pcb(file_name, point_number, number_of_tools)
-        self.data.distance_matrix()
-        self.data.times_matrix()
+        self.D = self.data.distance_matrix()
+        self.T = self.data.times_matrix()
         self.tmin = t_min
 
     def obj_function(self, permutation):
@@ -54,7 +54,7 @@ class ObjectiveFun():
         """
         permutation = np.insert(permutation, 0, [0])
         permutation = np.insert(permutation, permutation.shape[0], [0])
-        return distance_function(permutation, self.data.D, self.data.T) + loss_function(permutation, self.data.D, self.data.T, self.tmin)
+        return distance_function(permutation, self.D, self.T) + loss_function(permutation, self.D, self.T, self.tmin)
 
     def real_permutation(self, permutation):
         u"""Zwraca permutację na podstawie wektora rozwiązań, która
@@ -67,7 +67,7 @@ class ObjectiveFun():
         while True:
             if i == real_permutation.shape[0] - 1:
                 break
-            if self.data.T[real_permutation[i]][real_permutation[i + 1]] > 0:
+            if self.T[real_permutation[i]][real_permutation[i + 1]] > 0:
                 if (real_permutation[i] != 0) and (real_permutation[i + 1] != 0):
                     real_permutation = np.insert(real_permutation, i + 1, [0])
             i += 1

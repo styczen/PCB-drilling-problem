@@ -8,17 +8,18 @@ import numpy as np
 # number_of_tools = 1
 
 file_name = 'pcb.txt'
-point_number = 5
-number_of_tools = 2
+point_number = 25
+number_of_tools = 3
 
-t_min = 3 
-number_of_iterations = 100
-tabu_list_length = 10
-type_of_neighborhood = 2
+t_min = 3
+number_of_iterations = 10000
+tabu_list_length = 5
+type_of_neighborhood = 25
 stats_every_iteration = False
 OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
 
 init_solution = np.arange(1, point_number + 1)
+np.random.shuffle(init_solution)
 init_objective_fun_value = OF.obj_function(init_solution)
 
 print("Initial solution: " + str(init_solution))
@@ -27,8 +28,9 @@ print("Solution's length: " + str(len(init_solution)))
 
 # OF.data.show()
 
-TS = tabu_search.TabuSearch(file_name, init_solution, init_objective_fun_value, stats_every_iteration, 
-                            number_of_iterations, tabu_list_length, type_of_neighborhood)
+TS = tabu_search.TabuSearch(file_name, init_solution, init_objective_fun_value, stats_every_iteration,
+                 number_of_iterations, tabu_list_length, type_of_neighborhood,
+                 t_min, point_number, number_of_tools)
 
 TS.run()
 

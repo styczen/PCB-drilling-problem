@@ -48,6 +48,7 @@ class Pcb():
         '''Liczenie czasów przezbrojenia między pkt'''
         t=np.array([[4,9,4,5,4,5,5],[6,5,2,4,1,5,9],[2,5,5,1,6,7,3],[9,2,9,5,4,1,7],[1,9,7,7,2,2,3],
                     [6,4,9,6,3,6,3],[8,2,9,9,3,7,2]])
+        t=t*20
         #t = np.random.randint(low=1, high=10, size=(self.tools_number[-1], self.tools_number[-1]))
         T = np.zeros((len(self.D),len(self.D)))
         for i in range(len(T)):
@@ -70,9 +71,9 @@ class Pcb():
 
 
 if __name__ == "__main__":
-    pkta=1
-    pktb=10
-    dd=Pcb("pcb.txt",188,1)
+    pkta=39
+    pktb=130
+    dd=Pcb("pcb.txt",180,6)
     dd.distance_matrix()
     T=dd.times_matrix()
     print("Wielkość tablicy: {}".format(dd.distance_matrix().shape))
