@@ -10,7 +10,7 @@ class TabuSearch():
     """Class implements tabu search algorithm having cost funtion value"""
     def __init__(self, file_name, init_solution, init_objective_fun_value, stats_every_iteration,
                  number_of_iterations, tabu_list_length, type_of_neighborhood,
-                 t_min, point_number, number_of_tools, seed):
+                 t_min, point_number, number_of_tools, seed, fig_number):
         self.OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
         self.number_of_iterations = number_of_iterations
         self.early_break = False
@@ -24,6 +24,7 @@ class TabuSearch():
         self.all_objective_fun_value = np.array([])
         self.stats_every_iteration = stats_every_iteration
         self.seed = seed
+        self.fig_number = fig_number
         random.seed(seed)
         # self.aspiration_criteria = False
 
@@ -52,8 +53,8 @@ class TabuSearch():
         """Add new elements to the tabu list and removes those which are too long"""
         self.tabu_list = np.append(self.tabu_list, candidate)
         if self.tabu_list.reshape(len(self.tabu_list) // self.solution_length, self.solution_length).shape[0] >= self.tabu_list_length:
-            delete_vector = [i for i in range(self.solution_length)]
-            self.tabu_list = np.delete(self.tabu_list, delete_vector)
+            delete_vector_indices = [i for i in range(self.solution_length)]
+            self.tabu_list = np.delete(self.tabu_list, delete_vector_indices)
 
     def run(self):
         """Main method which searches for optimal solution; ends when objective function value does not change for 10000 iterations"""
@@ -79,7 +80,7 @@ class TabuSearch():
                 end_indicator = end_indicator + 1
             else:
                 end_indicator = 0
-            if (end_indicator == 20000):
+            if (end_indicator == 10000):
                 self.true_iter = i
                 self.early_break = True
                 break
@@ -97,24 +98,22 @@ class TabuSearch():
     def save_objective_fun_value_plot(self):
         """Saves plot of all objective function values to .png"""
         plt.plot(self.all_objective_fun_value)
-        plt.xlabel('Number of iteration')
+        plt.xlabel('Iteration')
         plt.ylabel('Value')
         plt.title('Objective function value')
         record = ""
         if self.early_break:
-            plt.savefig("Fig/"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"_"+"iter"+str(self.true_iter)+ \
-            "_"+"seed"+str(self.seed)+"_"+"val"+"{0:.2f}".format(self.objective_fun_value)+"_"+"type"+str(self.type_of_neighborhood)+ \
-            "_"+"tl"+str(self.tabu_list_length)+".png")
+            plt.savefig("Fig/"+str(self.fig_number)+".png")
 
-            record = [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.true_iter, self.seed, \
-            "{0:.2f}".format(self.objective_fun_value), self.type_of_neighborhood, self.tabu_list_length]
+            record = [self.fig_number, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.true_iter, \
+            self.seed, self.objective_fun_value, self.type_of_neighborhood, \
+            self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
         else:
-            plt.savefig("Fig/"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"_"+"iter"+str(self.number_of_iterations)+ \
-            "_"+"seed"+str(self.seed)+"_"+"val"+"{0:.2f}".format(self.objective_fun_value)+"_"+"type"+str(self.type_of_neighborhood)+ \
-            "_"+"tl"+str(self.tabu_list_length)+".png")
+            plt.savefig("Fig/"+str(self.fig_number)+".png")
 
-            record = [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.number_of_iterations, self.seed, \
-            "{0:.2f}".format(self.objective_fun_value), self.type_of_neighborhood, self.tabu_list_length]
+            record = [self.fig_number, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.number_of_iterations, \
+            self.seed, self.objective_fun_value, self.type_of_neighborhood, \
+            self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
         plt.close()
         with open('records.csv', 'a', newline='') as csvfile:
             write_record = csv.writer(csvfile, delimiter=',')
