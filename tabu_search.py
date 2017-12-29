@@ -4,6 +4,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import datetime
+import csv
 
 class TabuSearch():
     """Class implements tabu search algorithm having cost funtion value"""
@@ -12,6 +13,8 @@ class TabuSearch():
                  t_min, point_number, number_of_tools, seed):
         self.OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
         self.number_of_iterations = number_of_iterations
+        self.early_break = False
+        self.true_iter = 0
         self.tabu_list = np.array([], dtype=int)
         self.tabu_list_length = tabu_list_length
         self.objective_fun_value = init_objective_fun_value
@@ -53,7 +56,9 @@ class TabuSearch():
             self.tabu_list = np.delete(self.tabu_list, delete_vector)
 
     def run(self):
-        """Main method which searches for optimal solution"""
+        """Main method which searches for optimal solution; ends when objective function value does not change for 10000 iterations"""
+        end_indicator = 0
+        prev_value = self.objective_fun_value
         for i in range(self.number_of_iterations):
             self.all_objective_fun_value = np.append(self.all_objective_fun_value, self.objective_fun_value)
             best_candidate = self.get_neighbor()
@@ -70,6 +75,15 @@ class TabuSearch():
                 print("Iteration number: " + str(i + 1))
                 print("Solution: \n" + str(self.solution))
                 print("Objective function value: " + str(self.objective_fun_value), end="\n\n")
+            if (self.objective_fun_value == prev_value):
+                end_indicator = end_indicator + 1
+            else:
+                end_indicator = 0
+            if (end_indicator == 20000):
+                self.true_iter = i
+                self.early_break = True
+                break
+            prev_value = self.objective_fun_value
 
     def show_objective_fun_value_plot(self):
         """Display plot of all objective_fun_valuees"""
@@ -86,5 +100,23 @@ class TabuSearch():
         plt.xlabel('Number of iteration')
         plt.ylabel('Value')
         plt.title('Objective function value')
-        plt.savefig("Fig/"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"_"+"iter"+str(self.number_of_iterations)+"_"+"seed"+str(self.seed)+"_"+"val"+str(self.objective_fun_value)+"_"+"type"+str(self.type_of_neighborhood)+".png")
+        record = ""
+        if self.early_break:
+            plt.savefig("Fig/"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"_"+"iter"+str(self.true_iter)+ \
+            "_"+"seed"+str(self.seed)+"_"+"val"+"{0:.2f}".format(self.objective_fun_value)+"_"+"type"+str(self.type_of_neighborhood)+ \
+            "_"+"tl"+str(self.tabu_list_length)+".png")
+
+            record = [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.true_iter, self.seed, \
+            "{0:.2f}".format(self.objective_fun_value), self.type_of_neighborhood, self.tabu_list_length]
+        else:
+            plt.savefig("Fig/"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"_"+"iter"+str(self.number_of_iterations)+ \
+            "_"+"seed"+str(self.seed)+"_"+"val"+"{0:.2f}".format(self.objective_fun_value)+"_"+"type"+str(self.type_of_neighborhood)+ \
+            "_"+"tl"+str(self.tabu_list_length)+".png")
+
+            record = [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.number_of_iterations, self.seed, \
+            "{0:.2f}".format(self.objective_fun_value), self.type_of_neighborhood, self.tabu_list_length]
         plt.close()
+        with open('records.csv', 'a', newline='') as csvfile:
+            write_record = csv.writer(csvfile, delimiter=',')
+            write_record.writerow(record)
+    
