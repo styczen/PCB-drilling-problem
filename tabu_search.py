@@ -57,7 +57,9 @@ class TabuSearch():
     def update_memory(self, candidate):
         """Add new elements to the tabu list and removes those which are too long"""
         self.tabu_list = np.append(self.tabu_list, candidate)
+        print(len(self.tabu_list))
         if len(self.tabu_list) // self.solution_length > self.tabu_list_length:
+            print("L: " + str(len(self.tabu_list))+" S: "+str(self.solution_length))
             delete_vector_indices = [i for i in range(self.solution_length)]
             self.tabu_list = np.delete(self.tabu_list, delete_vector_indices)
 
@@ -66,24 +68,25 @@ class TabuSearch():
         end_indicator = 0
         prev_value = self.objective_fun_value
         start = timeit.default_timer()
+        end = 0
         for i in range(self.number_of_iterations):
             self.all_objective_fun_value_best = np.append(self.all_objective_fun_value_best, self.objective_fun_value)
             best_candidate = self.get_neighbor()
             tabu_candidate = self.get_tabu_candidate()
 
-            temp_obj_best_candidate = self.OF.obj_function(best_candidate)
-            self.all_objective_fun_value_best_candidate = np.append(self.all_objective_fun_value_best_candidate, temp_obj_best_candidate)
-            if temp_obj_best_candidate < self.objective_fun_value:
+            temporary_obj_best_candidate = self.OF.obj_function(best_candidate)
+            self.all_objective_fun_value_best_candidate = np.append(self.all_objective_fun_value_best_candidate, temporary_obj_best_candidate)
+            if temporary_obj_best_candidate < self.objective_fun_value:
                 self.solution = best_candidate
-                self.objective_fun_value = temp_obj_best_candidate
+                self.objective_fun_value = temporary_obj_best_candidate
 
-            temp_obj_tabu_candidate = self.OF.obj_function(tabu_candidate)
-            self.all_objective_fun_value_tabu_candidate = np.append(self.all_objective_fun_value_tabu_candidate, temp_obj_tabu_candidate)
-            if temp_obj_tabu_candidate < self.objective_fun_value:
+            temporary_obj_tabu_candidate = self.OF.obj_function(tabu_candidate)
+            self.all_objective_fun_value_tabu_candidate = np.append(self.all_objective_fun_value_tabu_candidate, temporary_obj_tabu_candidate)
+            if temporary_obj_tabu_candidate < self.objective_fun_value:
                 best_candidate = tabu_candidate
                 self.solution = tabu_candidate
-                self.objective_fun_value = temp_obj_tabu_candidate
-
+                self.objective_fun_value = temporary_obj_tabu_candidate
+            print("Watch out. It's here!!!")
             self.update_memory(best_candidate)
 
             if self.stats_every_iteration == True:
@@ -93,14 +96,26 @@ class TabuSearch():
 
             if (self.objective_fun_value == prev_value):
                 end_indicator = end_indicator + 1
+                last_valid_solution = np.copy(self.solution)
+                last_valid_solution_obj_value = self.objective_fun_value
             else:
                 end_indicator = 0
 
             if (end_indicator == 10000):
                 self.true_iter = i
-                self.early_break = True
-                break
+                # self.early_break = True
+                end = end + 1
+                self.early_break = False
+
+                self.solution = np.copy(last_valid_solution)
+                self.objective_fun_value = last_valid_solution_obj_value
+                print("Back to last valid solution completed")
+                print(str(self.objective_fun_value)+" "+str(last_valid_solution_obj_value))
+
             prev_value = self.objective_fun_value
+            if not i % 5000:
+                print(str(i)+"  "+str(int(self.objective_fun_value))+"  "+str(int(last_valid_solution_obj_value))+"  "+str(end_indicator)+"  "+str(end))
+
         stop = timeit.default_timer()
         self.time = stop - start
 

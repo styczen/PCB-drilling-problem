@@ -10,7 +10,8 @@ if __name__ == "__main__":
         fig_number = int(f.read())
 
     tabu_list_len = [150, 300, 450, 600, 750]
-    for i in range(1, 6):
+
+    for i in range(1, 2):
         fig_number = fig_number + 1
 
         # BEGIN - Parameters for algorithm 
@@ -18,11 +19,11 @@ if __name__ == "__main__":
         point_number = 188
         number_of_tools = 6
         t_min = 3
-        number_of_iterations = 200000
-        tabu_list_length = tabu_list_len[i - 1]
+        number_of_iterations = 400000
+        tabu_list_length = 300
         type_of_neighborhood = 2
+        seed = None
         stats_every_iteration = False
-        seed = 123
         # END - Parameters for algorithm  
 
         OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
