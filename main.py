@@ -19,7 +19,7 @@ if __name__ == "__main__":
         point_number = 188
         number_of_tools = 6
         t_min = 3
-        number_of_iterations = 400000
+        number_of_iterations = 500000
         tabu_list_length = 300
         type_of_neighborhood = 2
         seed = None
