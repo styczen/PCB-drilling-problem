@@ -20,11 +20,11 @@ if __name__ == "__main__":
         number_of_iterations = 1000000
         tabu_list_length = 1000
         type_of_neighborhood = 1
-        seed = 4444
+        seed = 5364
         # END - Parameters for algorithm  
 
         init_solution = np.arange(1, point_number + 1)
-        # np.random.shuffle(init_solution)
+        np.random.shuffle(init_solution)
 
         OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
         

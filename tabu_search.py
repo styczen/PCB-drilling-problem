@@ -115,7 +115,7 @@ class TabuSearch():
                 print("Back to last valid solution completed")
                 print("---"+str(i)+" "+str(int(self.objective_fun_value))+" "+str(int(prev_objective_fun_value)))
 
-            if prev_objective_fun_value == prev_prev_prev_objective_fun_value:
+            if self.objective_fun_value == prev_prev_objective_fun_value and prev_objective_fun_value == prev_prev_prev_objective_fun_value:
                 repeat_obj_value = repeat_obj_value + 1
             else:
                 repeat_obj_value = 0
