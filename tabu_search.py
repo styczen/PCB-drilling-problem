@@ -4,38 +4,33 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import datetime
-import csv
 import timeit
 
 class TabuSearch():
     """Class implements tabu search algorithm having cost funtion value"""
-    def __init__(self, file_name, init_solution, init_objective_fun_value, stats_every_iteration,
-                 number_of_iterations, tabu_list_length, type_of_neighborhood,
-                 t_min, point_number, number_of_tools, seed, fig_number):
+    def __init__(self, file_name, init_solution, number_of_iterations, tabu_list_length, 
+                 type_of_neighborhood, t_min, point_number, number_of_tools, seed):
         self.OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
         self.number_of_iterations = number_of_iterations
-        self.early_break = False
-        self.true_iter = 0
         self.tabu_list = np.array([], dtype=int)
         self.tabu_list_length = tabu_list_length
-        self.objective_fun_value = init_objective_fun_value
+        self.objective_fun_value = self.OF.obj_function(init_solution)
         self.solution = init_solution
         self.solution_length = len(self.solution)
         self.type_of_neighborhood = type_of_neighborhood
         self.all_objective_fun_value_best = np.array([])
         self.all_objective_fun_value_tabu_candidate = np.array([])
         self.all_objective_fun_value_best_candidate = np.array([])
-        self.stats_every_iteration = stats_every_iteration
         self.time = 0
         self.seed = seed
-        self.fig_number = fig_number
         random.seed(seed)
+        self.early_break = False
         # self.aspiration_criteria = False
 
     def get_tabu_candidate(self):
         """Permutes new neighborhood"""
         permutation = np.copy(self.solution)
-        for iteration in range(self.type_of_neighborhood):
+        for _ in range(self.type_of_neighborhood):
             index_a = random.randint(0, len(self.solution) - 1)
             index_b = random.randint(0, len(self.solution) - 1)
             permutation[index_a], permutation[index_b] = permutation[index_b], permutation[index_a]
@@ -66,8 +61,12 @@ class TabuSearch():
         """Main method which searches for optimal solution; ends when objective function value does not change for 10000 iterations"""
         local_min_indicator = 0
         prev_value = self.objective_fun_value
+
+        prev_solution = np.copy(self.solution)
+        prev_objective_fun_value = self.objective_fun_value
+
         start = timeit.default_timer()
-        end = 0
+
         for i in range(self.number_of_iterations):
             self.all_objective_fun_value_best = np.append(self.all_objective_fun_value_best, self.objective_fun_value)
             best_candidate = self.get_neighbor()
@@ -76,46 +75,38 @@ class TabuSearch():
             temporary_obj_best_candidate = self.OF.obj_function(best_candidate)
             self.all_objective_fun_value_best_candidate = np.append(self.all_objective_fun_value_best_candidate, temporary_obj_best_candidate)
             if temporary_obj_best_candidate < self.objective_fun_value:
+                prev_solution = np.copy(self.solution)
+                prev_objective_fun_value = self.objective_fun_value
                 self.solution = np.copy(best_candidate)
                 self.objective_fun_value = temporary_obj_best_candidate
 
             temporary_obj_tabu_candidate = self.OF.obj_function(tabu_candidate)
             self.all_objective_fun_value_tabu_candidate = np.append(self.all_objective_fun_value_tabu_candidate, temporary_obj_tabu_candidate)
             if temporary_obj_tabu_candidate < self.objective_fun_value:
+                prev_solution = np.copy(self.solution)
+                prev_objective_fun_value = self.objective_fun_value
                 best_candidate = np.copy(tabu_candidate)
                 self.solution = np.copy(tabu_candidate)
                 self.objective_fun_value = temporary_obj_tabu_candidate
 
             self.update_memory(best_candidate)
 
-            if self.stats_every_iteration == True:
-                print("Iteration number: " + str(i + 1))
-                print("Solution: \n" + str(self.solution))
-                print("Objective function value: " + str(self.objective_fun_value), end="\n\n")
-
-            if (self.objective_fun_value == prev_value):
+            if self.objective_fun_value == prev_value:
                 local_min_indicator = local_min_indicator + 1
-                last_valid_solution = np.copy(self.solution)
-                last_valid_solution_obj_value = self.objective_fun_value
             else:
                 local_min_indicator = 0
 
-            if (local_min_indicator >= 10000):
+            if local_min_indicator >= 10000:
                 local_min_indicator = 0
-                self.true_iter = i
-                # self.early_break = True
-                end = end + 1
-                self.early_break = False
+                self.solution = np.copy(prev_solution)
+                self.objective_fun_value = prev_objective_fun_value
 
-                self.solution = np.copy(last_valid_solution)
-                self.objective_fun_value = last_valid_solution_obj_value
                 print("Back to last valid solution completed")
-                print(str(self.objective_fun_value)+" "+str(last_valid_solution_obj_value))
-                print(str(i)+"  "+str(int(self.objective_fun_value))+"  "+str(int(last_valid_solution_obj_value))+"  "+str(local_min_indicator)+"  "+str(end))
+                print("---"+str(i)+" "+str(int(self.objective_fun_value))+" "+str(int(prev_objective_fun_value)))
 
             prev_value = self.objective_fun_value
-            if not i % 1000:
-                print(str(i)+"  "+str(int(self.objective_fun_value))+"  "+str(int(last_valid_solution_obj_value))+"  "+str(local_min_indicator)+"  "+str(end))
+            if i and not i % 1000:
+                print("Iter: "+str(i)+" Value: "+str(int(self.objective_fun_value))+" Ind: "+str(local_min_indicator))
 
         stop = timeit.default_timer()
         self.time = stop - start
@@ -145,31 +136,33 @@ class TabuSearch():
         plt.xlabel('Iteration')
         plt.ylabel('Value')
 
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         plt.plot(self.all_objective_fun_value_best)
         plt.title('Objective function value')
-        plt.savefig("Fig/"+str(self.fig_number)+"_"+str(1)+".png")
+        plt.savefig("Fig/"+str(date)+"_"+str(int(self.time))+"_"\
+                          +str(self.number_of_iterations)+"_"+str(self.seed)+"_"+str(int(self.objective_fun_value))+"_"\
+                          +str(self.type_of_neighborhood)+"_"+str(self.tabu_list_length)+"_"\
+                          +str(self.OF.tmin)+"_"+str(self.OF.data.number_of_tools)+".png")
         plt.clf()
 
         plt.plot(self.all_objective_fun_value_best_candidate,)
         plt.title('Best candidate objective function value')
-        plt.savefig("Fig/"+str(self.fig_number)+"_"+str(2)+".png")
+        plt.savefig("Fig/"+str(date)+"_"+str(int(self.time))+"_"\
+                          +str(self.number_of_iterations)+"_"+str(self.seed)+"_"+str(int(self.objective_fun_value))+"_"\
+                          +str(self.type_of_neighborhood)+"_"+str(self.tabu_list_length)+"_"\
+                          +str(self.OF.tmin)+"_"+str(self.OF.data.number_of_tools)+"_"+"best.png")
         plt.clf()
         
         plt.plot(self.all_objective_fun_value_tabu_candidate)
         plt.title('Tabu candidate objective function value')
-        plt.savefig("Fig/"+str(self.fig_number)+"_"+str(3)+".png")
+        plt.savefig("Fig/"+str(date)+"_"+str(int(self.time))+"_"\
+                          +str(self.number_of_iterations)+"_"+str(self.seed)+"_"+str(int(self.objective_fun_value))+"_"\
+                          +str(self.type_of_neighborhood)+"_"+str(self.tabu_list_length)+"_"\
+                          +str(self.OF.tmin)+"_"+str(self.OF.data.number_of_tools)+"_"+"tabu.png")
 
         plt.close()
 
-        if self.early_break:
-            record = [self.fig_number, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.time, \
-            self.true_iter+1, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
-            self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
-        else:
-            record = [self.fig_number, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.time, \
-            self.number_of_iterations+1, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
-            self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
-
-        with open('records.csv', 'a', newline='') as csvfile:
-            write_record = csv.writer(csvfile, delimiter=',')
-            write_record.writerow(record)
+        record = [date, int(self.time), \
+        self.number_of_iterations, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
+        self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
