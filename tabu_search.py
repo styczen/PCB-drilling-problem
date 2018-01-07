@@ -133,7 +133,7 @@ class TabuSearch():
 
     def save_objective_fun_value_plots(self):
         """Saves plot of all objective function values to .png"""
-        plt.figure()
+        plt.figure(figsize=(12, 9))
         plt.xlabel('Iteration')
         plt.ylabel('Value')
 
