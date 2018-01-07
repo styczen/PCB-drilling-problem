@@ -4,6 +4,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import datetime
+import csv
 import timeit
 
 class TabuSearch():
@@ -166,3 +167,7 @@ class TabuSearch():
         record = [date, int(self.time), \
         self.number_of_iterations, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
         self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
+
+        with open('records.csv', 'a') as csv_file:
+            write_record = csv.writer(csv_file, delimiter=",")
+            write_record.writerow(record)
