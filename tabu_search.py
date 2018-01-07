@@ -61,10 +61,16 @@ class TabuSearch():
     def run(self):
         """Main method which searches for optimal solution; ends when objective function value does not change for 10000 iterations"""
         local_min_indicator = 0
+        repeat_obj_value = 0
+
         prev_value = self.objective_fun_value
 
         prev_solution = np.copy(self.solution)
         prev_objective_fun_value = self.objective_fun_value
+
+        prev_prev_objective_fun_value = 0
+
+        prev_prev_prev_objective_fun_value = 0
 
         start = timeit.default_timer()
 
@@ -76,16 +82,20 @@ class TabuSearch():
             temporary_obj_best_candidate = self.OF.obj_function(best_candidate)
             self.all_objective_fun_value_best_candidate = np.append(self.all_objective_fun_value_best_candidate, temporary_obj_best_candidate)
             if temporary_obj_best_candidate < self.objective_fun_value:
-                prev_solution = np.copy(self.solution)
+                prev_prev_prev_objective_fun_value = prev_prev_objective_fun_value
+                prev_prev_objective_fun_value = prev_objective_fun_value
                 prev_objective_fun_value = self.objective_fun_value
+                prev_solution = np.copy(self.solution)
                 self.solution = np.copy(best_candidate)
                 self.objective_fun_value = temporary_obj_best_candidate
 
             temporary_obj_tabu_candidate = self.OF.obj_function(tabu_candidate)
             self.all_objective_fun_value_tabu_candidate = np.append(self.all_objective_fun_value_tabu_candidate, temporary_obj_tabu_candidate)
             if temporary_obj_tabu_candidate < self.objective_fun_value:
-                prev_solution = np.copy(self.solution)
+                prev_prev_prev_objective_fun_value = prev_prev_objective_fun_value
+                prev_prev_objective_fun_value = prev_objective_fun_value
                 prev_objective_fun_value = self.objective_fun_value
+                prev_solution = np.copy(self.solution)
                 best_candidate = np.copy(tabu_candidate)
                 self.solution = np.copy(tabu_candidate)
                 self.objective_fun_value = temporary_obj_tabu_candidate
@@ -95,7 +105,7 @@ class TabuSearch():
             if self.objective_fun_value == prev_value:
                 local_min_indicator = local_min_indicator + 1
             else:
-                local_min_indicator = 0
+                local_min_indicator = 0   
 
             if local_min_indicator >= 10000:
                 local_min_indicator = 0
@@ -104,6 +114,15 @@ class TabuSearch():
 
                 print("Back to last valid solution completed")
                 print("---"+str(i)+" "+str(int(self.objective_fun_value))+" "+str(int(prev_objective_fun_value)))
+
+            if prev_objective_fun_value == prev_prev_prev_objective_fun_value:
+                repeat_obj_value = repeat_obj_value + 1
+            else:
+                repeat_obj_value = 0
+
+            if repeat_obj_value == 3:
+                self.number_of_iterations = i
+                break
 
             prev_value = self.objective_fun_value
             if i and not i % 1000:
