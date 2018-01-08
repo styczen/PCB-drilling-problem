@@ -8,8 +8,6 @@ import sys
 
 if __name__ == "__main__":
 
-    tabu_list_len = [500, 1000, 1500]
-
     for i in range(1):
 
         # BEGIN - Parameters for algorithm 
@@ -18,8 +16,8 @@ if __name__ == "__main__":
         number_of_tools = 6
         t_min = 3
         number_of_iterations = 1000000
-        tabu_list_length = 5000
-        type_of_neighborhood = 2
+        tabu_list_length = 50
+        type_of_neighborhood = 1
         seed = None
         # END - Parameters for algorithm  
 

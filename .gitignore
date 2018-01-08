@@ -167,3 +167,5 @@ venv.bak/
 
 .~lock.records.csv#
 test_tabu_list.py
+tabu_search_new.py
+main_new.py
