@@ -14,6 +14,7 @@ class Pcb():
         self.y = [0]
         self.tools_number = [0]
         self.number_of_tools = number_of_tools
+        self.point_number = point_number
         self.read_data(point_number, number_of_tools)
 
     def read_data(self, point_number, number_of_tools):

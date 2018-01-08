@@ -15,20 +15,20 @@ if __name__ == "__main__":
         # BEGIN - Parameters for algorithm 
         file_name = 'pcb.txt'
         point_number = 188
-        number_of_tools = 1
+        number_of_tools = 6
         t_min = 3
         number_of_iterations = 1000000
-        tabu_list_length = 3000
-        type_of_neighborhood = 1
+        tabu_list_length = 5000
+        type_of_neighborhood = 2
         seed = None
         # END - Parameters for algorithm  
 
         init_solution = np.arange(1, point_number + 1)
-        # np.random.shuffle(init_solution)
+        #np.random.shuffle(init_solution)
 
         OF = obj_function.ObjectiveFun(file_name, t_min, point_number, number_of_tools)
-        
-        TS = tabu_search.TabuSearch(file_name, init_solution, number_of_iterations, tabu_list_length, 
+
+        TS = tabu_search.TabuSearch(file_name, init_solution, number_of_iterations, tabu_list_length,
                                     type_of_neighborhood, t_min, point_number, number_of_tools, seed)
 
         start = timeit.default_timer()
@@ -53,6 +53,6 @@ if __name__ == "__main__":
 
         # TS.show_objective_fun_value_plots()
 
-    
+
 
 

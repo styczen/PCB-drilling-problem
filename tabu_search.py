@@ -144,7 +144,7 @@ class TabuSearch():
         plt.savefig("Fig/"+str(date)+"_"+str(int(self.time))+"_"\
                           +str(self.number_of_iterations)+"_"+str(self.seed)+"_"+str(int(self.objective_fun_value))+"_"\
                           +str(self.type_of_neighborhood)+"_"+str(self.tabu_list_length)+"_"\
-                          +str(self.OF.tmin)+"_"+str(self.OF.data.number_of_tools)+".png")
+                          +str(self.OF.tmin)+"_"+str(self.OF.data.point_number)+"_"+str(self.OF.data.number_of_tools)+".png")
         plt.clf()
 
         plt.plot(self.all_objective_fun_value_best_candidate,)
@@ -152,7 +152,7 @@ class TabuSearch():
         plt.savefig("Fig/"+str(date)+"_"+str(int(self.time))+"_"\
                           +str(self.number_of_iterations)+"_"+str(self.seed)+"_"+str(int(self.objective_fun_value))+"_"\
                           +str(self.type_of_neighborhood)+"_"+str(self.tabu_list_length)+"_"\
-                          +str(self.OF.tmin)+"_"+str(self.OF.data.number_of_tools)+"_"+"best.png")
+                          +str(self.OF.tmin)+"_"+str(self.OF.data.point_number)+"_"+str(self.OF.data.number_of_tools)+"_"+"best.png")
         plt.clf()
         
         plt.plot(self.all_objective_fun_value_tabu_candidate)
@@ -160,13 +160,13 @@ class TabuSearch():
         plt.savefig("Fig/"+str(date)+"_"+str(int(self.time))+"_"\
                           +str(self.number_of_iterations)+"_"+str(self.seed)+"_"+str(int(self.objective_fun_value))+"_"\
                           +str(self.type_of_neighborhood)+"_"+str(self.tabu_list_length)+"_"\
-                          +str(self.OF.tmin)+"_"+str(self.OF.data.number_of_tools)+"_"+"tabu.png")
+                          +str(self.OF.tmin)+"_"+str(self.OF.data.point_number)+"_"+str(self.OF.data.number_of_tools)+"_"+"tabu.png")
 
         plt.close()
 
         record = [date, int(self.time), \
         self.number_of_iterations, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
-        self.tabu_list_length, self.OF.tmin, self.OF.data.number_of_tools]
+        self.tabu_list_length, self.OF.tmin, self.OF.data.point_number, self.OF.data.number_of_tools]
 
         with open('records.csv', 'a') as csv_file:
             write_record = csv.writer(csv_file, delimiter=",")
