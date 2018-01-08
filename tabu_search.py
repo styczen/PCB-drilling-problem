@@ -16,6 +16,7 @@ class TabuSearch():
         self.tabu_list = np.array([], dtype=int)
         self.tabu_list_length = tabu_list_length
         self.objective_fun_value = self.OF.obj_function(init_solution)
+        self.init_solution = init_solution
         self.solution = init_solution
         self.solution_length = len(self.solution)
         self.type_of_neighborhood = type_of_neighborhood
@@ -26,7 +27,6 @@ class TabuSearch():
         self.seed = seed
         random.seed(seed)
         self.early_break = False
-        # self.aspiration_criteria = False
 
     def get_tabu_candidate(self):
         """Permutes new neighborhood"""
@@ -81,21 +81,29 @@ class TabuSearch():
 
             temporary_obj_best_candidate = self.OF.obj_function(best_candidate)
             self.all_objective_fun_value_best_candidate = np.append(self.all_objective_fun_value_best_candidate, temporary_obj_best_candidate)
+
             if temporary_obj_best_candidate < self.objective_fun_value:
                 prev_prev_prev_objective_fun_value = prev_prev_objective_fun_value
+
                 prev_prev_objective_fun_value = prev_objective_fun_value
+
                 prev_objective_fun_value = self.objective_fun_value
                 prev_solution = np.copy(self.solution)
+
                 self.solution = np.copy(best_candidate)
                 self.objective_fun_value = temporary_obj_best_candidate
 
             temporary_obj_tabu_candidate = self.OF.obj_function(tabu_candidate)
             self.all_objective_fun_value_tabu_candidate = np.append(self.all_objective_fun_value_tabu_candidate, temporary_obj_tabu_candidate)
+
             if temporary_obj_tabu_candidate < self.objective_fun_value:
                 prev_prev_prev_objective_fun_value = prev_prev_objective_fun_value
+
                 prev_prev_objective_fun_value = prev_objective_fun_value
+
                 prev_objective_fun_value = self.objective_fun_value
                 prev_solution = np.copy(self.solution)
+
                 best_candidate = np.copy(tabu_candidate)
                 self.solution = np.copy(tabu_candidate)
                 self.objective_fun_value = temporary_obj_tabu_candidate
@@ -122,6 +130,9 @@ class TabuSearch():
 
             if repeat_obj_value == 3:
                 self.number_of_iterations = i
+                if prev_objective_fun_value < self.objective_fun_value:
+                    self.solution = np.copy(prev_solution)
+                    self.objective_fun_value = prev_objective_fun_value
                 break
 
             prev_value = self.objective_fun_value
@@ -185,7 +196,8 @@ class TabuSearch():
 
         record = [date, int(self.time), \
         self.number_of_iterations, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
-        self.tabu_list_length, self.OF.tmin, self.OF.data.point_number, self.OF.data.number_of_tools]
+        self.tabu_list_length, self.OF.tmin, self.OF.data.point_number, self.OF.data.number_of_tools, \
+        str(self.init_solution), str(self.solution)]
 
         with open('records.csv', 'a') as csv_file:
             write_record = csv.writer(csv_file, delimiter=",")
