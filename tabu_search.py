@@ -197,7 +197,7 @@ class TabuSearch():
         record = [date, int(self.time), \
         self.number_of_iterations, self.seed, self.objective_fun_value, self.type_of_neighborhood, \
         self.tabu_list_length, self.OF.tmin, self.OF.data.point_number, self.OF.data.number_of_tools, \
-        str(self.init_solution), str(self.solution)]
+        self.init_solution, self.solution]
 
         with open('records.csv', 'a') as csv_file:
             write_record = csv.writer(csv_file, delimiter=",")
