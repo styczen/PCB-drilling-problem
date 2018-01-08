@@ -11,12 +11,12 @@ if __name__ == "__main__":
     for i in range(1):
 
         # BEGIN - Parameters for algorithm 
-        file_name = 'pcb.txt'
-        point_number = 188
+        file_name = 'pcb_big.txt'
+        point_number = 986
         number_of_tools = 6
         t_min = 3
-        number_of_iterations = 1000000
-        tabu_list_length = 50
+        number_of_iterations = 500000
+        tabu_list_length = 250
         type_of_neighborhood = 1
         seed = None
         # END - Parameters for algorithm  
