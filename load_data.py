@@ -19,8 +19,8 @@ class Pcb():
 
     def read_data(self, point_number, number_of_tools):
         '''Tworzenie wektora rodzaju narzędzia oraz wczytanie danych z pliku'''
-        if number_of_tools > 6 or number_of_tools < 1 or point_number > 188:
-            print('Podano złą wartośś liczby pkt lub narzędzi')
+        if number_of_tools > 6 or number_of_tools < 1:
+            print('Podano złą wartość liczby narzędzi')
         point_per_tool = int(point_number/number_of_tools)
         for i in range(1, number_of_tools+1):
             for a in range(i, i+point_per_tool):
@@ -75,7 +75,7 @@ class Pcb():
 if __name__ == "__main__":
     pkta=39
     pktb=130
-    dd=Pcb("pcb.txt",180,6)
+    dd=Pcb("pcb_big.txt",960,6)
     dd.distance_matrix()
     T=dd.times_matrix()
     print("Wielkość tablicy: {}".format(dd.distance_matrix().shape))
