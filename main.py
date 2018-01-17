@@ -7,17 +7,17 @@ import random
 import sys
 
 if __name__ == "__main__":
-
-    for i in range(1):
+    tabu = [1, 10, 100, 350, 600, 1000]
+    for i in range(4):
 
         # BEGIN - Parameters for algorithm 
-        file_name = 'pcb_big.txt'
-        point_number = 986
-        number_of_tools = 6
+        file_name = 'pcb.txt'
+        point_number = 10
+        number_of_tools = 3
         t_min = 3
         number_of_iterations = 1000000
-        tabu_list_length = 3000
-        type_of_neighborhood = 1
+        tabu_list_length = tabu[i]
+        type_of_neighborhood = 4
         seed = None
         # END - Parameters for algorithm  
 
